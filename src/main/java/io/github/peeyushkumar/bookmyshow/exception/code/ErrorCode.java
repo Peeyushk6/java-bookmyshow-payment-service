@@ -1,0 +1,31 @@
+package io.github.peeyushkumar.bookmyshow.exception.code;
+
+public enum ErrorCode {
+
+    // Merchant
+    MERCHANT_NOT_FOUND,
+    MERCHANT_INACTIVE,
+    INVALID_API_KEY,
+
+    // Payment
+    PAYMENT_NOT_FOUND,
+    DUPLICATE_PAYMENT,
+    PAYMENT_ALREADY_PROCESSED,
+    INVALID_PAYMENT_STATE,
+    UNSUPPORTED_PAYMENT_PROVIDER,
+
+    // Gateway
+    PAYMENT_GATEWAY_ERROR,
+    GATEWAY_TIMEOUT,
+    GATEWAY_AUTHENTICATION_ERROR,
+    GATEWAY_COMMUNICATION_ERROR,
+
+    // Webhook
+    INVALID_WEBHOOK_SIGNATURE,
+
+    // Validation
+    VALIDATION_ERROR,
+
+    // Generic
+    INTERNAL_SERVER_ERROR
+}

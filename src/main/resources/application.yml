@@ -2,5 +2,39 @@ server:
   port: 8081
 
 spring:
+
   application:
     name: payment-service
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/bookmyshow_payment
+    username: peeyush
+    password: password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+    show-sql: true
+
+    properties:
+      hibernate:
+        format_sql: true
+
+payment:
+
+  providers:
+
+    razorpay:
+      enabled: true
+      key-id: ${RAZORPAY_KEY_ID}
+      key-secret: ${RAZORPAY_KEY_SECRET}
+      webhook-secret: ${RAZORPAY_WEBHOOK_SECRET}
+      order-expiry: 15m
+
+    stripe:
+      enabled: false
+      api-key: ${STRIPE_API_KEY:}
+      webhook-secret: ${STRIPE_WEBHOOK_SECRET}
+      payment-intent-expiry: 30m
