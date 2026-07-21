@@ -44,7 +44,7 @@ public class GatewayPaymentDetails
         /**
          * UTC Timestamp
          */
-        private Instant paidAt;
+        private LocalDateTime paidAt;
 
         /**
          * Complete provider response as JSON

@@ -2,8 +2,11 @@ package io.github.peeyushkumar.bookmyshow.gateway.contract.model;
 
 public enum GatewayPaymentStatus {
     CREATED,
-    PENDING,
-    SUCCESS,
+    AUTHORIZED,
+    CAPTURED,
     FAILED,
-    CANCELLED
+    REFUNDED,
+    CANCELLED,
+    PENDING,
+    UNKNOWN
 }

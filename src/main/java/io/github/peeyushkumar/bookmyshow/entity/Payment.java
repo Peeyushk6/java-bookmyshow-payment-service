@@ -12,6 +12,7 @@ import java.sql.Ref;
 import java.time.LocalDateTime;
 
 
+//Rich Domain Models
 @Entity
 @Table(
         name = "payments",
@@ -93,6 +94,12 @@ public class Payment extends BaseEntity{
     @Setter()
     private LocalDateTime expiresAt;
 
+    /**
+     * Optional checkout URL.
+     *
+     * Some providers (Stripe Checkout) return a hosted payment page.
+     * Others (Razorpay Orders) expect the frontend SDK to render checkout.
+     */
     private String checkoutUrl;
 
     @Lob
@@ -100,18 +107,38 @@ public class Payment extends BaseEntity{
     private String gatewayMetadata;
 
     public void markProcessing(
-            GatewayOrderResponse response) {
+            String providerOrderId,
+            String checkoutUrl,
+            String gatewayMetadata,
+            LocalDateTime expiresAt
+    ){
 
-        this.providerOrderId = response.getProviderOrderId();
-
-        this.checkoutUrl = response.getCheckoutUrl();
-
-        this.gatewayMetadata = response.getGatewayMetadata();
-
+        this.providerOrderId = providerOrderId;
+        this.checkoutUrl = checkoutUrl;
+        this.gatewayMetadata = gatewayMetadata;
         this.status = PaymentStatus.PROCESSING;
+        this.expiresAt = expiresAt;
 
-        this.expiresAt = response.getExpiresAt();
+    }
 
+    public void markSuccess(
+            String providerPaymentId,
+            PaymentMethod paymentMethod,
+            String gatewayMetadata
+    ){
+
+        this.providerPaymentId = providerPaymentId;
+        this.paymentMethod = paymentMethod;
+        this.gatewayMetadata = gatewayMetadata;
+        this.status = PaymentStatus.SUCCESS;
+
+    }
+    public void markFailure(){
+        this.status = PaymentStatus.FAILED;
+    }
+
+    public void markVerificationPending() {
+        this.status = PaymentStatus.PROCESSING;
     }
 
 }

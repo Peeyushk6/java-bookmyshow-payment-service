@@ -1,10 +1,12 @@
 package io.github.peeyushkumar.bookmyshow.enums;
 
 public enum PaymentMethod {
+    CARD,
     UPI,
-    CREDIT_CARD,
-    DEBIT_CARD,
     NET_BANKING,
     WALLET,
-    EMI
+    EMI,
+    CREDIT_CARD,
+    DEBIT_CARD,
+    UNKNOWN
 }

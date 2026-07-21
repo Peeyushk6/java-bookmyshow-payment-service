@@ -2,9 +2,22 @@ package io.github.peeyushkumar.bookmyshow.enums;
 
 public enum FailureReason {
 
-    NETWORK_ERROR,
+    SIGNATURE_INVALID,
+
+    AMOUNT_MISMATCH,
+
+    CURRENCY_MISMATCH,
+
+    ORDER_ID_MISMATCH,
+
+    PAYMENT_NOT_FOUND,
+
+    PROVIDER_PAYMENT_NOT_FOUND,
+
     GATEWAY_TIMEOUT,
-    USER_CANCELLED,
-    PAYMENT_DECLINED,
-    UNKNOWN_ERROR
+
+    GATEWAY_ERROR,
+
+    UNKNOWN
+
 }

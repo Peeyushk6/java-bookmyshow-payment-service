@@ -15,6 +15,17 @@ public abstract class PaymentServiceException extends RuntimeException
     protected PaymentServiceException(
             HttpStatus status,
             ErrorCode errorCode,
+            String message,
+            Throwable cause
+    ){
+        super(message, cause);
+        this.status = status;
+        this.errorCode = errorCode;
+    }
+
+    protected PaymentServiceException(
+            HttpStatus status,
+            ErrorCode errorCode,
             String message
     ){
         super(message);

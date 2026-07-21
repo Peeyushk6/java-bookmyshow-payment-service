@@ -1,9 +1,11 @@
 package io.github.peeyushkumar.bookmyshow.gateway.provider.razorpay.mapper;
 
 import com.razorpay.Order;
-import io.github.peeyushkumar.bookmyshow.config.PaymentProviderProperties;
+import io.github.peeyushkumar.bookmyshow.gateway.contract.model.GatewayPaymentStatus;
 import io.github.peeyushkumar.bookmyshow.gateway.contract.order.GatewayCreateOrderRequest;
 import io.github.peeyushkumar.bookmyshow.gateway.contract.order.GatewayOrderResponse;
+import io.github.peeyushkumar.bookmyshow.gateway.contract.payment.GatewayVerifyPaymentRequest;
+import io.github.peeyushkumar.bookmyshow.gateway.contract.payment.GatewayVerifyPaymentResponse;
 import lombok.AllArgsConstructor;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
@@ -14,7 +16,7 @@ import java.time.LocalDateTime;
 
 @Component
 @AllArgsConstructor
-public class RazorpayMapper {
+public class RazorpayOrderMapper {
 
     public JSONObject toCreateOrderRequest(
             GatewayCreateOrderRequest request) {
@@ -58,6 +60,7 @@ public class RazorpayMapper {
                 .providerOrderId(
                         order.get("id").toString()
                 )
+                .paymentStatus(GatewayPaymentStatus.CREATED)
                 .gatewayMetadata(
                         order.toJson().toString(2)
                 )

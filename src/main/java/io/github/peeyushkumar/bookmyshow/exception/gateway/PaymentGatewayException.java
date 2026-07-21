@@ -7,12 +7,16 @@ import org.springframework.http.HttpStatus;
 public class PaymentGatewayException
         extends PaymentServiceException {
 
-    public PaymentGatewayException(String message) {
+    public PaymentGatewayException(
+            String message,
+            Throwable cause
+    ){
 
         super(
                 HttpStatus.BAD_GATEWAY,
                 ErrorCode.PAYMENT_GATEWAY_ERROR,
-                message
+                message,
+                cause
         );
 
     }

@@ -14,6 +14,9 @@ public enum ErrorCode {
     INVALID_PAYMENT_STATE,
     UNSUPPORTED_PAYMENT_PROVIDER,
 
+    // Payment Attempt
+    PAYMENT_ATTEMPT_NOT_FOUND,
+
     // Gateway
     PAYMENT_GATEWAY_ERROR,
     GATEWAY_TIMEOUT,

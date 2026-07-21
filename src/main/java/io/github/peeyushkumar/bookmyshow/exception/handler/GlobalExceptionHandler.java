@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import io.github.peeyushkumar.bookmyshow.exception.response.ErrorResponse;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -67,6 +68,32 @@ public class GlobalExceptionHandler {
                 .internalServerError()
                 .body(response);
 
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidation(
+            MethodArgumentNotValidException ex,
+            HttpServletRequest request) {
+
+        String message = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .findFirst()
+                .map(error -> error.getField() + " : " + error.getDefaultMessage())
+                .orElse("Validation failed");
+
+        ErrorResponse response =
+                ErrorResponse.builder()
+                        .timestamp(Instant.now())
+                        .status(HttpStatus.BAD_REQUEST.value())
+                        .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                        .errorCode(ErrorCode.VALIDATION_ERROR)
+                        .message(message)
+                        .path(request.getRequestURI())
+                        .correlationId(MDC.get(CorrelationIdHolder.CORRELATION_ID))
+                        .build();
+
+        return ResponseEntity.badRequest().body(response);
     }
 
 }

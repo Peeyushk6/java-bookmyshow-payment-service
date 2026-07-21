@@ -15,4 +15,8 @@ public interface PaymentPersistenceService {
             Merchant merchant,
             String idempotencyKey);
 
+    Optional<Payment> findByProviderOrderId(
+            String providerOrderId
+    );
+
 }

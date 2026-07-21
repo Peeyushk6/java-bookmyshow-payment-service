@@ -1,12 +1,14 @@
 package io.github.peeyushkumar.bookmyshow.mapper;
 
+import io.github.peeyushkumar.bookmyshow.dto.request.PaymentVerificationRequest;
 import io.github.peeyushkumar.bookmyshow.entity.Merchant;
 import io.github.peeyushkumar.bookmyshow.entity.Payment;
 import io.github.peeyushkumar.bookmyshow.gateway.contract.order.GatewayCreateOrderRequest;
+import io.github.peeyushkumar.bookmyshow.gateway.contract.payment.GatewayVerifyPaymentRequest;
 import org.springframework.stereotype.Component;
 
 @Component
-public class GatewayMapper {
+public class PaymentGatewayMapper {
 
     public GatewayCreateOrderRequest toGatewayRequest(Payment payment) {
 
@@ -20,5 +22,17 @@ public class GatewayMapper {
                 .description(payment.getDescription())
                 .callbackUrl(merchant.getCallbackUrl())
                 .build();
+    }
+
+    public GatewayVerifyPaymentRequest toGatewayVerifyPaymentRequest(
+            PaymentVerificationRequest request
+    ) {
+
+        return GatewayVerifyPaymentRequest.builder()
+                .providerOrderId(request.providerOrderId())
+                .providerPaymentId(request.providerPaymentId())
+                .gatewaySignature(request.providerSignature())
+                .build();
+
     }
 }

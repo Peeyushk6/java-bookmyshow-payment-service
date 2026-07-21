@@ -1,6 +1,7 @@
 package io.github.peeyushkumar.bookmyshow.mapper;
 
 import io.github.peeyushkumar.bookmyshow.dto.response.PaymentResponse;
+import io.github.peeyushkumar.bookmyshow.dto.response.PaymentVerificationResponse;
 import io.github.peeyushkumar.bookmyshow.entity.Payment;
 import io.github.peeyushkumar.bookmyshow.gateway.dto.request.GatewayPaymentRequest;
 import org.springframework.stereotype.Component;
@@ -29,6 +30,20 @@ public class PaymentMapper {
                 .amount(payment.getAmount())
                 .currency(payment.getCurrency())
                 .paymentMethod(payment.getPaymentMethod())
+                .build();
+
+    }
+
+    public PaymentVerificationResponse toVerificationResponse(
+            Payment payment
+    ) {
+
+        return PaymentVerificationResponse.builder()
+                .paymentId(payment.getId())
+                .status(payment.getStatus())
+                .providerOrderId(payment.getProviderOrderId())
+                .providerPaymentId(payment.getProviderPaymentId())
+                .verifiedAt(payment.getUpdatedAt())
                 .build();
 
     }

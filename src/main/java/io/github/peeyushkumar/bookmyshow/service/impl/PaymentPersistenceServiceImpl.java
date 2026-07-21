@@ -5,6 +5,7 @@ import io.github.peeyushkumar.bookmyshow.entity.Payment;
 import io.github.peeyushkumar.bookmyshow.repository.PaymentRepository;
 import io.github.peeyushkumar.bookmyshow.service.PaymentPersistenceService;
 import lombok.AllArgsConstructor;
+import okio.Options;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -17,7 +18,6 @@ public class PaymentPersistenceServiceImpl implements PaymentPersistenceService
 
     @Override
     public Payment save(Payment payment) {
-        System.out.println(payment.getCreatedAt());
         return paymentRepository.save(payment);
     }
 
@@ -35,6 +35,13 @@ public class PaymentPersistenceServiceImpl implements PaymentPersistenceService
                         merchant,
                         idempotencyKey
                 );
+    }
+
+    @Override
+    public Optional<Payment> findByProviderOrderId(
+            String providerOrderId
+    ){
+        return paymentRepository.findByProviderOrderId(providerOrderId);
     }
 
 }
