@@ -42,7 +42,7 @@ public class PaymentAttemptServiceImpl
     }
 
     @Override
-    public void markSuccess(PaymentAttempt attempt, GatewayPaymentStatus gatewayStatus, String providerOrderId, String responsePayload) {
+    public void markSuccess(PaymentAttempt attempt, GatewayPaymentStatus gatewayStatus, String providerOrderId, String paymentId, String responsePayload) {
          attempt.completeSuccessfully(
                 gatewayStatus,
                 providerOrderId,

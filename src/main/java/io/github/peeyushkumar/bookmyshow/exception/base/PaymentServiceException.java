@@ -2,12 +2,12 @@ package io.github.peeyushkumar.bookmyshow.exception.base;
 
 import io.github.peeyushkumar.bookmyshow.exception.code.ErrorCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
+
 @Getter
-public abstract class PaymentServiceException extends RuntimeException
-{
+public abstract class PaymentServiceException extends RuntimeException {
+
     private final HttpStatus status;
 
     private final ErrorCode errorCode;
@@ -15,10 +15,9 @@ public abstract class PaymentServiceException extends RuntimeException
     protected PaymentServiceException(
             HttpStatus status,
             ErrorCode errorCode,
-            String message,
-            Throwable cause
-    ){
-        super(message, cause);
+            String message
+    ) {
+        super(message);
         this.status = status;
         this.errorCode = errorCode;
     }
@@ -26,10 +25,12 @@ public abstract class PaymentServiceException extends RuntimeException
     protected PaymentServiceException(
             HttpStatus status,
             ErrorCode errorCode,
-            String message
-    ){
-        super(message);
+            String message,
+            Throwable cause
+    ) {
+        super(message, cause);
         this.status = status;
         this.errorCode = errorCode;
     }
+
 }

@@ -1,7 +1,6 @@
 package io.github.peeyushkumar.bookmyshow.service.impl;
 
 import io.github.peeyushkumar.bookmyshow.entity.Merchant;
-import io.github.peeyushkumar.bookmyshow.enums.MerchantStatus;
 import io.github.peeyushkumar.bookmyshow.exception.merchant.MerchantInactiveException;
 import io.github.peeyushkumar.bookmyshow.exception.merchant.MerchantNotFoundException;
 import io.github.peeyushkumar.bookmyshow.repository.MerchantRepository;

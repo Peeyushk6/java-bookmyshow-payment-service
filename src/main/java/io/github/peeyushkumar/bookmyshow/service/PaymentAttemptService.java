@@ -11,25 +11,31 @@ import io.github.peeyushkumar.bookmyshow.gateway.contract.order.GatewayCreateOrd
 import io.github.peeyushkumar.bookmyshow.gateway.contract.order.GatewayOrderResponse;
 import io.github.peeyushkumar.bookmyshow.gateway.contract.payment.GatewayVerifyPaymentRequest;
 import io.github.peeyushkumar.bookmyshow.gateway.contract.payment.GatewayVerifyPaymentResponse;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
 
 public interface PaymentAttemptService {
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     PaymentAttempt startAttempt(
             Payment payment,
             PaymentAttemptType attemptType,
             String requestPayload
     );
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     void markSuccess(
             PaymentAttempt attempt,
             GatewayPaymentStatus gatewayStatus,
             String providerOrderId,
+            String paymentId,
             String responsePayload
     );
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     void markFailure(
             PaymentAttempt attempt,
 
@@ -38,6 +44,7 @@ public interface PaymentAttemptService {
             String responsePayload
     );
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     void markTimeout(
             PaymentAttempt attempt
     );

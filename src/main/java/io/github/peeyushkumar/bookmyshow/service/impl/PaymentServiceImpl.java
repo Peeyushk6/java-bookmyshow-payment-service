@@ -90,6 +90,7 @@ public class PaymentServiceImpl implements PaymentService {
                     attempt,
                     gatewayResponse.getPaymentStatus(),
                     gatewayResponse.getProviderOrderId(),
+                    null,
                     gatewayResponse.getGatewayMetadata()
             );
 

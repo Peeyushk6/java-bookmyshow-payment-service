@@ -16,6 +16,10 @@ public enum ErrorCode {
 
     // Payment Attempt
     PAYMENT_ATTEMPT_NOT_FOUND,
+    INVALID_PAYMENT_SIGNATURE,
+    AMOUNT_MISMATCH,
+    CURRENCY_MISMATCH,
+    ORDER_ID_MISMATCH,
 
     // Gateway
     PAYMENT_GATEWAY_ERROR,
