@@ -3,12 +3,10 @@ package io.github.peeyushkumar.bookmyshow.service.impl;
 import io.github.peeyushkumar.bookmyshow.entity.Payment;
 import io.github.peeyushkumar.bookmyshow.entity.PaymentAttempt;
 import io.github.peeyushkumar.bookmyshow.enums.PaymentAttemptType;
-import io.github.peeyushkumar.bookmyshow.exception.payment.PaymentNotFoundException;
 import io.github.peeyushkumar.bookmyshow.exception.paymentattempt.PaymentAttemptNotFoundException;
 import io.github.peeyushkumar.bookmyshow.repository.PaymentAttemptRepository;
 import io.github.peeyushkumar.bookmyshow.service.PaymentAttemptPersistenceService;
 import lombok.AllArgsConstructor;
-import lombok.Setter;
 import org.springframework.stereotype.Service;
 
 @Service

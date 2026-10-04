@@ -10,6 +10,8 @@ import io.github.peeyushkumar.bookmyshow.service.PaymentAttemptPersistenceServic
 import io.github.peeyushkumar.bookmyshow.service.PaymentAttemptService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -42,11 +44,15 @@ public class PaymentAttemptServiceImpl
     }
 
     @Override
-    public void markSuccess(PaymentAttempt attempt, GatewayPaymentStatus gatewayStatus, String providerOrderId, String paymentId, String responsePayload) {
-         attempt.completeSuccessfully(
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void markSuccess(Long attemptId, GatewayPaymentStatus gatewayStatus, String providerOrderId, String paymentId, String responsePayload) {
+        PaymentAttempt attempt =
+                persistenceAttemptService.findById(attemptId);
+
+        attempt.completeSuccessfully(
                 gatewayStatus,
                 providerOrderId,
-                attempt.getProviderPaymentId(),
+                paymentId,
                 responsePayload
         );
 
@@ -54,7 +60,16 @@ public class PaymentAttemptServiceImpl
     }
 
     @Override
-    public void markFailure(PaymentAttempt attempt, FailureReason failureReason, String responsePayload) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void markFailure(
+            Long attemptId,
+            FailureReason failureReason,
+            String responsePayload
+    ) {
+
+        PaymentAttempt attempt =
+                persistenceAttemptService.findById(attemptId);
+
         attempt.completeWithFailure(
                 failureReason,
                 responsePayload
@@ -64,9 +79,14 @@ public class PaymentAttemptServiceImpl
     }
 
     @Override
-    public void markTimeout(PaymentAttempt attempt) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void markTimeout(Long attemptId) {
+
+        PaymentAttempt attempt =
+                persistenceAttemptService.findById(attemptId);
 
         attempt.completeWithTimeout();
+
         persistenceAttemptService.save(attempt);
     }
 }

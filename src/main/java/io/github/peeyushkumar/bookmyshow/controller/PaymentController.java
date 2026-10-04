@@ -4,11 +4,10 @@ import io.github.peeyushkumar.bookmyshow.dto.request.CreatePaymentRequest;
 import io.github.peeyushkumar.bookmyshow.dto.request.PaymentVerificationRequest;
 import io.github.peeyushkumar.bookmyshow.dto.response.PaymentResponse;
 import io.github.peeyushkumar.bookmyshow.dto.response.PaymentVerificationResponse;
-import io.github.peeyushkumar.bookmyshow.service.PaymentService;
-import io.github.peeyushkumar.bookmyshow.service.impl.PaymentVerificationService;
+import io.github.peeyushkumar.bookmyshow.service.PaymentFacadeService;
+import io.github.peeyushkumar.bookmyshow.service.PaymentVerificationFacadeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +17,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class PaymentController {
 
-    private final PaymentService paymentService;
-    private final PaymentVerificationService paymentVerificationService;
+    private final PaymentFacadeService paymentFacadeService;
+    private final PaymentVerificationFacadeService paymentVerificationFacadeService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -28,15 +27,18 @@ public class PaymentController {
             @RequestBody
             CreatePaymentRequest request
     ){
-        return paymentService.createPayment(request);
+        return paymentFacadeService.createPayment(request);
     }
 
     @PostMapping("/verify")
-    public ResponseEntity<PaymentVerificationResponse> verifyPayment(
-            @Valid @RequestBody PaymentVerificationRequest request) {
+    public ResponseEntity<PaymentVerificationResponse> verify(
+            @Valid
+            @RequestBody
+            PaymentVerificationRequest request
+    ) {
 
         return ResponseEntity.ok(
-                paymentVerificationService.verify(request)
+                paymentVerificationFacadeService.verify(request)
         );
     }
 

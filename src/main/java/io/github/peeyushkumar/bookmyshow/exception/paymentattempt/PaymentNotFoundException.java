@@ -1,4 +1,4 @@
-package io.github.peeyushkumar.bookmyshow.exception.payment;
+package io.github.peeyushkumar.bookmyshow.exception.paymentattempt;
 
 import io.github.peeyushkumar.bookmyshow.enums.FailureReason;
 import io.github.peeyushkumar.bookmyshow.exception.base.PaymentAttemptException;

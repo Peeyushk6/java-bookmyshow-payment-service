@@ -1,5 +1,13 @@
 package io.github.peeyushkumar.bookmyshow.service.impl;
 
+import io.github.peeyushkumar.bookmyshow.dto.request.PaymentVerificationRequest;
+import io.github.peeyushkumar.bookmyshow.dto.response.PaymentVerificationResponse;
+import io.github.peeyushkumar.bookmyshow.service.PaymentVerificationFacadeService;
+import io.github.peeyushkumar.bookmyshow.service.PaymentVerificationProcessingService;
+import io.github.peeyushkumar.bookmyshow.service.PaymentVerificationService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
 /**
  * Orchestrates the complete payment verification workflow.
  *
@@ -22,6 +30,31 @@ package io.github.peeyushkumar.bookmyshow.service.impl;
  * This avoids long-running transactions while waiting on external APIs
  * and prevents transaction visibility issues with PaymentAttempt auditing.
  */
+@Service
+@RequiredArgsConstructor
 public class PaymentVerificationFacadeServiceImpl
-{
+        implements PaymentVerificationFacadeService {
+
+    private final PaymentVerificationService paymentVerificationService;
+
+    private final PaymentVerificationProcessingService
+            paymentVerificationProcessingService;
+
+    @Override
+    public PaymentVerificationResponse verify(
+            PaymentVerificationRequest request
+    ) {
+
+        Long paymentId =
+                paymentVerificationService.verify(
+                        request
+                );
+
+        return paymentVerificationProcessingService.process(
+                paymentId,
+                request
+        );
+
+    }
+
 }

@@ -5,7 +5,6 @@ import io.github.peeyushkumar.bookmyshow.entity.Payment;
 import io.github.peeyushkumar.bookmyshow.repository.PaymentRepository;
 import io.github.peeyushkumar.bookmyshow.service.PaymentPersistenceService;
 import lombok.AllArgsConstructor;
-import okio.Options;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -25,6 +24,13 @@ public class PaymentPersistenceServiceImpl implements PaymentPersistenceService
     @Override
     public Payment update(Payment payment) {
         return paymentRepository.save(payment);
+    }
+
+    @Override
+    public Optional<Payment> findById(Long paymentId) {
+
+        return paymentRepository.findById(paymentId);
+
     }
 
     @Override

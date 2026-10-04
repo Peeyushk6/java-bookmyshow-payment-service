@@ -11,12 +11,17 @@ public interface PaymentPersistenceService {
 
     Payment update(Payment payment);
 
-    Optional<Payment> findByMerchantAndIdempotencyKey(
-            Merchant merchant,
-            String idempotencyKey);
+    Optional<Payment> findById(
+            Long paymentId
+    );
 
     Optional<Payment> findByProviderOrderId(
             String providerOrderId
+    );
+
+    Optional<Payment> findByMerchantAndIdempotencyKey(
+            Merchant merchant,
+            String idempotencyKey
     );
 
 }
