@@ -6,12 +6,12 @@ import io.github.peeyushkumar.bookmyshow.exception.code.ErrorCode;
 import org.springframework.http.HttpStatus;
 
 public class PaymentNotFoundException extends PaymentAttemptException {
-    public PaymentNotFoundException(String providerOrderId){
+    public PaymentNotFoundException(Long paymentId){
         super(
                 HttpStatus.NOT_FOUND,
                 ErrorCode.PAYMENT_NOT_FOUND,
                 FailureReason.PAYMENT_NOT_FOUND,
-                "Payment not found : " + providerOrderId
+                "Payment not found : " + paymentId
         );
     }
 }

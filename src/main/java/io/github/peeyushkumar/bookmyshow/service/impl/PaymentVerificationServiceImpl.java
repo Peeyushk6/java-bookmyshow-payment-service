@@ -10,7 +10,7 @@ import io.github.peeyushkumar.bookmyshow.enums.PaymentStatus;
 import io.github.peeyushkumar.bookmyshow.exception.base.PaymentAttemptException;
 import io.github.peeyushkumar.bookmyshow.exception.base.PaymentServiceException;
 import io.github.peeyushkumar.bookmyshow.exception.payment.InvalidPaymentException;
-import io.github.peeyushkumar.bookmyshow.exception.payment.PaymentNotFoundException;
+import io.github.peeyushkumar.bookmyshow.exception.payment.PaymentProviderNotFoundException;
 import io.github.peeyushkumar.bookmyshow.gateway.contract.payment.GatewayVerifyPaymentRequest;
 import io.github.peeyushkumar.bookmyshow.gateway.contract.payment.GatewayVerifyPaymentResponse;
 import io.github.peeyushkumar.bookmyshow.gateway.router.PaymentGatewayRouter;
@@ -25,15 +25,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 @Slf4j
+@Transactional
 public class PaymentVerificationService {
 
     private final PaymentPersistenceService paymentPersistenceService;
 
     private final PaymentGatewayRouter paymentGatewayRouter;
 
-    private final PaymentGatewayMapper gatewayMapper;
+    private final PaymentGatewayMapper paymentGatewayMapper;
 
     private final PaymentMapper paymentMapper;
 
@@ -44,7 +44,14 @@ public class PaymentVerificationService {
     ) {
 
         // 1. Load Payment
-        Payment payment = loadPayment(request);
+        Payment payment =
+                paymentPersistenceService
+                        .findByProviderOrderId(request.providerOrderId())
+                        .orElseThrow(() ->
+                                new PaymentProviderNotFoundException(
+                                        request.providerPaymentId()
+                                )
+                        );
 
         // 2. Idempotency
         if (payment.getStatus() == PaymentStatus.SUCCESS) {
@@ -56,19 +63,26 @@ public class PaymentVerificationService {
 
         // 4. Build Gateway Request
         GatewayVerifyPaymentRequest gatewayRequest =
-                gatewayMapper.toGatewayVerifyPaymentRequest(request);
+                paymentGatewayMapper.toGatewayVerifyPaymentRequest(
+                        request
+                );
 
-        // 5. Every gateway interaction MUST have an attempt
+        // 5. Start Audit Attempt
         PaymentAttempt attempt =
                 paymentAttemptService.startAttempt(
                         payment,
                         PaymentAttemptType.VERIFY_PAYMENT,
                         gatewayRequest.toString()
                 );
+        System.out.println("Attempt id = -------" + attempt.getId());
+
+
+        Long attemptId = attempt.getId();
+        log.info("Attempt created {}--------", attemptId);
 
         try {
 
-            // 6. Call Gateway
+            // 6. Verify Payment
             GatewayVerifyPaymentResponse gatewayResponse =
                     paymentGatewayRouter.verifyPayment(
                             payment.getProvider(),
@@ -78,105 +92,65 @@ public class PaymentVerificationService {
             // 7. Validate Signature
             validateGatewayResponse(gatewayResponse);
 
-            // 8. Reconcile Response
-            reconcilePayment(payment, gatewayResponse);
+            // 8. Reconcile Payment
+            reconcilePayment(
+                    payment,
+                    gatewayResponse
+            );
 
-            // 9. Update Payment
-            transitionPayment(payment, gatewayResponse);
+            // 9. Transition Aggregate
+            transitionPayment(
+                    payment,
+                    gatewayResponse
+            );
 
             // 10. Persist Payment
             paymentPersistenceService.update(payment);
 
-            // 11. Audit Success (Best effort)
-            try {
+            // 11. Complete Attempt
+            completeAttemptSuccessfully(
+                    attemptId,
+                    gatewayResponse
+            );
 
-                paymentAttemptService.markSuccess(
-                        attempt,
-                        gatewayResponse.getPaymentStatus(),
-                        gatewayResponse.getProviderOrderId(),
-                        gatewayResponse.getProviderPaymentId(),
-                        gatewayResponse.getGatewayMetadata()
-                );
-
-            } catch (Exception ex) {
-
-                log.error(
-                        "Unable to mark payment attempt {} as SUCCESS",
-                        attempt.getId(),
-                        ex
-                );
-
-            }
-
-            // 12. Response
-            return paymentMapper.toVerificationResponse(payment);
+            return paymentMapper.toVerificationResponse(
+                    payment
+            );
 
         }
         catch (PaymentAttemptException ex) {
 
-            try {
-
-                paymentAttemptService.markFailure(
-                        attempt,
-                        ex.getFailureReason(),
-                        ex.getMessage()
-                );
-
-            } catch (Exception logException) {
-
-                log.error(
-                        "Unable to mark payment attempt {} as FAILED",
-                        attempt.getId(),
-                        logException
-                );
-
-            }
+            completeAttemptWithFailure(
+                    attemptId,
+                    ex.getFailureReason(),
+                    ex
+            );
 
             throw ex;
 
         }
         catch (PaymentServiceException ex) {
 
+            completeAttemptWithFailure(
+                    attemptId,
+                    FailureReason.UNKNOWN,
+                    ex
+            );
+
             throw ex;
 
         }
         catch (Exception ex) {
 
-            try {
-
-                paymentAttemptService.markFailure(
-                        attempt,
-                        FailureReason.INTERNAL_ERROR,
-                        ex.getMessage()
-                );
-
-            } catch (Exception logException) {
-
-                log.error(
-                        "Unable to mark payment attempt {} as FAILED",
-                        attempt.getId(),
-                        logException
-                );
-
-            }
+            completeAttemptWithFailure(
+                    attemptId,
+                    FailureReason.INTERNAL_ERROR,
+                    ex
+            );
 
             throw ex;
 
         }
-
-    }
-
-    private Payment loadPayment(
-            PaymentVerificationRequest request
-    ) {
-
-        return paymentPersistenceService
-                .findByProviderOrderId(request.providerOrderId())
-                .orElseThrow(() ->
-                        new PaymentNotFoundException(
-                                request.providerOrderId()
-                        )
-                );
 
     }
 
@@ -234,7 +208,8 @@ public class PaymentVerificationService {
 
         }
 
-        if (payment.getCurrency() != response.getCurrency()) {
+        if (payment.getCurrency() !=
+                response.getCurrency()) {
 
             throw new InvalidPaymentException(
                     payment.getProviderOrderId()
@@ -270,6 +245,60 @@ public class PaymentVerificationService {
                     throw new InvalidPaymentException(
                             response.getProviderOrderId()
                     );
+
+        }
+
+    }
+
+    private void completeAttemptSuccessfully(
+            Long attemptId,
+            GatewayVerifyPaymentResponse response
+    ) {
+
+        try {
+
+            paymentAttemptService.markSuccess(
+                    attemptId,
+                    response.getPaymentStatus(),
+                    response.getProviderOrderId(),
+                    response.getProviderPaymentId(),
+                    response.getGatewayMetadata()
+            );
+
+        } catch (Exception ex) {
+
+            log.error(
+                    "Failed to mark VERIFY_PAYMENT attempt {} as SUCCESS",
+                    attemptId,
+                    ex
+            );
+
+        }
+
+    }
+
+    private void completeAttemptWithFailure(
+            Long attemptId,
+            FailureReason failureReason,
+            Exception exception
+    ) {
+        log.info("Recording failure for attempt {}", attemptId);
+
+
+        try {
+            paymentAttemptService.markFailure(
+                    attemptId,
+                    failureReason,
+                    exception.getMessage()
+            );
+
+        } catch (Exception ex) {
+
+            log.error(
+                    "Failed to mark VERIFY_PAYMENT attempt {} as FAILED",
+                    attemptId,
+                    ex
+            );
 
         }
 
